@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JC Player Mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0&family=Roboto:wght@400;500;700&display=swap">
+<style>
+:root{
+  --accent:#4F8CFF;
+  --bg:#111318; --surface:#181B22; --surface2:#20242C; --surface3:#282C35;
+  --text:#E6E8EE; --muted:#9AA0AC; --divider:#2A2E37;
+  --page:#0b0c0f;
+}
+:root[data-theme="amoled"]{ --bg:#000; --surface:#0A0A0A; --surface2:#141414; --surface3:#1C1C1C; --divider:#1f1f1f; }
+:root[data-theme="light"]{ --bg:#FAFAFC; --surface:#FFFFFF; --surface2:#F0F1F5; --surface3:#E6E8EE; --text:#1A1C20; --muted:#5F6470; --divider:#E2E4EA; --page:#e9ebf0; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--page);color:var(--text);font-family:Roboto,system-ui,sans-serif;min-height:100vh;display:flex;gap:32px;justify-content:center;align-items:flex-start;padding:32px 16px;flex-wrap:wrap}
+.ms{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;font-size:24px;line-height:1;display:inline-block;user-select:none;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
+.fill{font-variation-settings:'FILL' 1}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ---------- phone frame ---------- */
+.phone{width:380px;height:800px;border-radius:44px;background:#000;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,.45),0 0 0 2px #2b2e36 inset;position:relative;flex:none;transition:width .35s,height .35s}
+.phone.landscape{width:820px;height:400px}
+.screen{width:100%;height:100%;border-radius:34px;overflow:hidden;background:var(--bg);position:relative;display:flex;flex-direction:column}
+.statusbar{height:30px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:13px;color:var(--text)}
+.statusbar .ms{font-size:16px}
+.landscape .statusbar{display:none}
+
+/* ---------- app chrome ---------- */
+.topbar{height:60px;flex:none;display:flex;align-items:center;padding:0 4px 0 16px;gap:4px}
+.topbar h1{font-size:21px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar.sub{padding-left:4px}
+.icon-btn{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--text)}
+.icon-btn:hover{background:color-mix(in srgb,var(--text) 8%,transparent)}
+.content{flex:1;overflow-y:auto;position:relative;scrollbar-width:none}
+.content::-webkit-scrollbar{display:none}
+.navbar{height:76px;flex:none;background:var(--surface);display:flex;justify-content:space-around;align-items:center;padding-bottom:8px}
+.nav{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--muted);width:80px}
+.nav .pill{width:60px;height:30px;border-radius:15px;display:grid;place-items:center}
+.nav.active{color:var(--text)}
+.nav.active .pill{background:color-mix(in srgb,var(--accent) 28%,transparent)}
+.nav.active .ms{font-variation-settings:'FILL' 1}
+.fab{position:absolute;right:16px;bottom:16px;height:56px;border-radius:16px;background:color-mix(in srgb,var(--accent) 30%,var(--surface2));color:var(--text);display:flex;align-items:center;gap:10px;padding:0 20px 0 16px;font-weight:500;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.fab.round{width:56px;padding:0;justify-content:center}
+
+/* ---------- lists ---------- */
+.row{display:flex;align-items:center;gap:14px;padding:10px 16px;cursor:pointer}
+.row:hover{background:color-mix(in srgb,var(--text) 5%,transparent)}
+.folder-ic{width:52px;height:52px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);flex:none}
+.folder-ic .ms{font-size:30px}
+.grow{flex:1;min-width:0}
+.title{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.title2{font-size:15px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.meta{font-size:12.5px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px}
+.thumb{width:128px;aspect-ratio:16/10;border-radius:8px;position:relative;overflow:hidden;flex:none}
+.thumb .dur{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.67);color:#fff;font-size:11px;padding:1px 4px;border-radius:4px}
+.thumb .prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.33)}
+.thumb .prog i{display:block;height:100%;background:var(--accent)}
+.badge{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;padding:12px}
+.grid .thumb{width:100%}
+.grid .cell{cursor:pointer}
+.grid .cell .title2{font-size:14px;margin-top:6px}
+.section{color:var(--accent);font-size:14px;font-weight:500;padding:22px 16px 6px}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:80px 32px;color:var(--muted);gap:8px}
+.empty .ms{font-size:56px}
+.empty b{color:var(--text);font-weight:500;font-size:16px}
+
+/* ---------- bottom sheet / dialog ---------- */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:20;display:flex;align-items:flex-end;animation:fade .2s}
+.sheet{width:100%;background:var(--surface2);border-radius:28px 28px 0 0;padding:10px 0 24px;animation:up .22s ease-out}
+.sheet .handle{width:32px;height:4px;border-radius:2px;background:var(--muted);opacity:.5;margin:6px auto 10px}
+.sheet .head{padding:4px 24px 10px;font-size:16px;font-weight:500}
+.sheet .item{display:flex;align-items:center;gap:20px;padding:14px 24px;cursor:pointer;font-size:15px}
+.sheet .item:hover{background:color-mix(in srgb,var(--text) 6%,transparent)}
+.dialog-wrap{align-items:center;justify-content:center}
+.dialog{width:86%;background:var(--surface2);border-radius:28px;padding:24px;animation:fade .2s}
+.dialog h3{font-size:22px;font-weight:400;margin-bottom:14px}
+.dialog .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.tbtn{color:var(--accent);font-weight:500;padding:10px 12px;border-radius:20px}
+.radio{display:flex;align-items:center;gap:14px;padding:9px 0;cursor:pointer}
+.radio i{width:20px;height:20px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center}
+.radio.on i{border-color:var(--accent)}
+.radio.on i::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes fade{from{opacity:0}}
+
+/* ---------- inputs ---------- */
+.field{display:flex;align-items:center;gap:8px;border:1px solid var(--muted);border-radius:6px;padding:0 6px 0 14px;height:54px;margin:0 16px}
+.field input{flex:1;background:none;border:0;outline:none;color:var(--text);font:inherit;font-size:15px}
+.switch{width:52px;height:32px;border-radius:16px;background:var(--surface3);border:2px solid var(--muted);position:relative;flex:none;transition:.2s}
+.switch::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:var(--muted);top:6px;left:6px;transition:.2s}
+.switch.on{background:var(--accent);border-color:var(--accent)}
+.switch.on::after{width:24px;height:24px;top:2px;left:22px;background:#fff}
+.set-row{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer}
+.set-row:hover{background:color-mix(in srgb,var(--text) 5%,transparent)}
+.set-row .sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+/* ---------- PIN ---------- */
+.pin{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px 24px}
+.dots{display:flex;gap:14px}
+.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--muted)}
+.dots i.on{background:var(--accent);border-color:var(--accent)}
+.keypad{display:grid;grid-template-columns:repeat(3,72px);gap:14px;margin-top:10px}
+.keypad button{height:72px;border-radius:50%;background:var(--surface2);font-size:24px}
+.keypad button:hover{background:var(--surface3)}
+
+/* ---------- player ---------- */
+.player{position:absolute;inset:0;background:#000;color:#fff;overflow:hidden;user-select:none;cursor:default}
+.player video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transform-origin:center;transition:filter .1s}
+.player .gest{position:absolute;inset:0}
+.ctrl{position:absolute;inset:0;transition:opacity .25s;pointer-events:none}
+.ctrl.hidden{opacity:0}
+.ctrl > *{pointer-events:auto}
+.ctrl.hidden > *{pointer-events:none}
+.p-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:2px;padding:6px 8px;background:linear-gradient(rgba(0,0,0,.8),transparent)}
+.p-top .t{flex:1;font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:24px}
+.rb{width:52px;height:52px;border-radius:50%;background:rgba(0,0,0,.2);display:grid;place-items:center;color:#fff}
+.rb .ms{font-size:30px}
+.rb.big{width:72px;height:72px;background:rgba(0,0,0,.4)}
+.rb.big .ms{font-size:46px}
+.rb.dis{opacity:.35}
+.p-bottom{position:absolute;left:0;right:0;bottom:0;padding:4px 14px 6px;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+.seek{display:flex;align-items:center;gap:12px;font-size:13px}
+.track{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.3);position:relative;cursor:pointer}
+.track .buf{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.45);border-radius:2px}
+.track .pos{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:2px}
+.track .knob{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%)}
+.p-row{display:flex;align-items:center;gap:2px}
+.p-row .sp{flex:1}
+.speed-btn{display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:18px;font-size:14px}
+.p-ic{color:#fff}
+.p-ic.on{color:var(--accent)}
+.hud{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.67);border-radius:14px;padding:14px 22px;text-align:center;display:none;min-width:160px}
+.hud.show{display:block}
+.hud .l1{font-size:22px;font-weight:500}
+.hud .l2{font-size:15px;margin-top:2px}
+.hud .bar{height:4px;background:rgba(255,255,255,.25);border-radius:2px;margin-top:10px;overflow:hidden}
+.hud .bar i{display:block;height:100%;background:var(--accent)}
+.subs{position:absolute;left:0;right:0;bottom:12%;text-align:center;pointer-events:none;padding:0 40px}
+.subs span{font-size:20px;line-height:1.35;color:#fff;text-shadow:0 0 3px #000,0 0 3px #000,1px 1px 2px #000}
+.resume{position:absolute;left:16px;bottom:96px;background:rgba(32,32,32,.87);border-radius:20px;padding:2px 4px 2px 14px;display:flex;align-items:center;gap:6px;font-size:14px}
+.lock-btn{position:absolute;left:24px;top:50%;transform:translateY(-50%);width:56px;height:56px;border-radius:50%;background:rgba(0,0,0,.53);display:grid;place-items:center}
+.panel-scrim{position:absolute;inset:0;z-index:5}
+.panel{position:absolute;top:0;right:0;bottom:0;width:340px;max-width:85%;background:rgba(21,23,28,.93);padding:16px;overflow-y:auto;animation:slide .2s ease-out;scrollbar-width:none}
+.panel h4{font-size:16px;font-weight:500;margin-bottom:8px}
+.prow{display:flex;align-items:center;padding:10px 4px;cursor:pointer;border-radius:8px;gap:8px}
+.prow:hover{background:rgba(255,255,255,.06)}
+.prow .s{font-size:12px;color:rgba(255,255,255,.67);margin-top:2px}
+.prow.sel{color:var(--accent);font-weight:500}
+.prow.sel::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);margin-left:auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:rgba(255,255,255,.13);padding:6px 12px;border-radius:16px;font-size:14px;cursor:pointer}
+.chip.sel{background:var(--accent)}
+.stepper{display:flex;align-items:center;gap:4px;margin:6px 0}
+.stepper button{background:rgba(255,255,255,.13);padding:6px 8px;border-radius:6px;font-size:13px}
+.stepper span{padding:0 8px}
+.hr{height:1px;background:rgba(255,255,255,.2);margin:8px 0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.eq-row{display:flex;align-items:center;gap:8px;font-size:12px}
+.eq-row label{width:40px}
+.eq-row b{width:32px;font-weight:400;text-align:right}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:#2f3138;color:#fff;padding:10px 16px;border-radius:20px;font-size:13.5px;z-index:40;white-space:nowrap;animation:fade .2s}
+@keyframes slide{from{transform:translateX(100%)}}
+
+/* ---------- side controls (mockup only) ---------- */
+.side{width:300px;background:var(--surface);border-radius:20px;padding:20px;flex:none;align-self:flex-start}
+.side h2{font-size:18px;font-weight:500;margin-bottom:4px}
+.side p{font-size:13px;color:var(--muted);line-height:1.5}
+.side .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:7px 12px;border-radius:16px;background:var(--surface2);font-size:13px}
+.seg button.on{background:var(--accent);color:#fff}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid transparent}
+.sw.on{border-color:var(--text)}
+.side ul{font-size:13px;color:var(--muted);line-height:1.7;padding-left:18px}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone"><div class="screen" id="screen"></div></div>
+
+<aside class="side">
+  <h2>JC Player mockup</h2>
+  <p>A clickable preview of the app's screens, for reviewing the design. It mirrors the Kotlin UI, but it isn't the real app.</p>
+  <div class="lbl">Theme</div>
+  <div class="seg" id="themeSeg"></div>
+  <div class="lbl">Accent colour</div>
+  <div class="seg" id="accentSeg"></div>
+  <div class="lbl">Try in the player</div>
+  <ul>
+    <li>Click the video to show or hide the controls</li>
+    <li>Drag up/down on the left half for brightness, right half for volume</li>
+    <li>Drag sideways to seek</li>
+    <li>Double-click the left or right third to skip 10s, the centre to play/pause</li>
+    <li>Scroll the mouse wheel to zoom (pinch)</li>
+    <li>⋮ opens the More panel, which has the equalizer, sleep timer and A–B repeat</li>
+  </ul>
+  <div class="lbl">Library</div>
+  <ul>
+    <li>Long-press (or right-click) a folder or video for its actions</li>
+    <li>Private folder PIN: any 4 digits</li>
+  </ul>
+</aside>
+
+<script>
+// ---------------- data ----------------
+const folders = [
+  {name:"Movies", path:"/storage/emulated/0/Movies", n:7, size:"18.4 GB"},
+  {name:"WhatsApp Video", path:"/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Video", n:58, size:"1.2 GB"},
+  {name:"Camera", path:"/storage/emulated/0/DCIM/Camera", n:24, size:"6.8 GB"},
+  {name:"Download", path:"/storage/emulated/0/Download", n:12, size:"3.1 GB"},
+  {name:"Telegram Video", path:"/storage/emulated/0/Telegram/Telegram Video", n:19, size:"2.4 GB"},
+  {name:"Screen recordings", path:"/storage/emulated/0/Movies/Screen recordings", n:5, size:"410 MB"},
+  {name:"Series S01", path:"/storage/emulated/0/Series S01", n:10, size:"7.9 GB"},
+];
+const palettes = [["#3a6ff7","#8a4fff"],["#ff8a3d","#ff3d77"],["#1fbfae","#2a6cf7"],["#4cc36b","#1c7a5c"],["#ff5c8a","#7a3dff"],["#f7b733","#fc4a1a"],["#536976","#292E49"],["#00c6ff","#0072ff"]];
+const videos = [
+  {t:"Episode 1 - The Beginning.mkv", d:"42:18", s:"1.4 GB", r:"1080p", p:1, nw:false},
+  {t:"Episode 2 - Crossroads.mkv", d:"44:02", s:"1.5 GB", r:"1080p", p:.62, nw:false},
+  {t:"Episode 3 - Night Shift.mkv", d:"41:47", s:"1.4 GB", r:"1080p", p:0, nw:true},
+  {t:"Episode 4 - The Long Road.mkv", d:"45:10", s:"1.6 GB", r:"1080p", p:0, nw:true},
+  {t:"Episode 5 - Echoes.mkv", d:"43:33", s:"1.5 GB", r:"1080p", p:0, nw:true},
+  {t:"Episode 10 - Finale.mkv", d:"58:21", s:"2.1 GB", r:"1080p", p:0, nw:false},
+  {t:"Trailer.mp4", d:"2:31", s:"84 MB", r:"720p", p:.3, nw:false},
+];
+const subsCues = [[0.5,3.5,"Hello from an external SRT file"],[4,7,"Subtitles can be resized, recoloured and synced"],[7.5,9.8,"Double-click the sides to skip"]];
+
+// ---------------- state ----------------
+const S = {
+  tab:"folders", screen:"folders", folder:null, grid:false, theme:"dark", accent:0,
+  settings:{resume:true,next:true,bg:false,pip:true,rotate:true,boost:true,keepBright:false,gB:true,gV:true,gS:true,gD:true,gP:true,autoSubs:true,dot:false},
+  sort:"Name", asc:true, query:"", pin:"", unlocked:false,
+  playlists:[{name:"Watch later",n:4},{name:"Workout mix",n:9}],
+  urls:["https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8","rtsp://192.168.1.20:554/stream1"],
+  shares:[{name:"Home PC",host:"192.168.1.10",share:"Movies"}],
+};
+const accents = [["Blue","#4F8CFF"],["Violet","#9B6BFF"],["Teal","#1FBFAE"],["Orange","#FF8A3D"],["Pink","#FF5C8A"],["Green","#4CC36B"]];
+const $ = (s,el=document)=>el.querySelector(s);
+const screen = $("#screen"), phone = $("#phone");
+const ic = (n,cls="")=>`<span class="ms ${cls}">${n}</span>`;
+const thumbBg = i => { const [a,b]=palettes[i%palettes.length]; return `background:linear-gradient(135deg,${a},${b})`; };
+
+function statusbar(){ const d=new Date(); return `<div class="statusbar"><b style="font-weight:500">${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}</b><span>${ic("signal_cellular_alt")} ${ic("wifi")} ${ic("battery_5_bar")}</span></div>`; }
+function navbar(){
+  const tabs=[["folders","Videos","folder"],["playlists","Playlists","playlist_play"],["network","Network","lan"],["settings","Settings","settings"]];
+  return `<div class="navbar">${tabs.map(([k,l,i])=>`<button class="nav ${S.tab===k?"active":""}" onclick="go('${k}',true)"><span class="pill">${ic(i)}</span>${l}</button>`).join("")}</div>`;
+}
+function topbar(title,{back,actions=""}={}){
+  return `<div class="topbar ${back?"sub":""}">${back?`<button class="icon-btn" onclick="${back}">${ic("arrow_back")}</button>`:""}<h1>${title}</h1>${actions}</div>`;
+}
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; screen.appendChild(t); setTimeout(()=>t.remove(),1800); }
+
+function go(screenName,isTab){
+  if(isTab) S.tab=screenName;
+  S.screen=screenName;
+  render();
+}
+
+// ---------------- screens ----------------
+function render(){
+  stopPlayer();
+  phone.classList.toggle("landscape", S.screen==="player");
+  const fn = {folders:Folders,videos:Videos,search:Search,playlists:Playlists,network:Network,settings:Settings,vault:Vault,player:Player}[S.screen];
+  screen.innerHTML = "";
+  fn();
+}
+
+function Folders(){
+  screen.innerHTML = statusbar() + topbar("JC Player",{actions:`
+      <button class="icon-btn" onclick="go('search')">${ic("search")}</button>
+      <button class="icon-btn" onclick="sortDialog()">${ic("sort")}</button>
+      <button class="icon-btn" onclick="moreMenu()">${ic("more_vert")}</button>`}) +
+    `<div class="content">${folders.map((f,i)=>`
+      <div class="row" onclick="openFolder(${i})" oncontextmenu="event.preventDefault();folderSheet(${i})" data-lp="folderSheet(${i})">
+        <div class="folder-ic">${ic("folder","fill")}</div>
+        <div class="grow"><div class="title">${f.name}</div><div class="meta">${f.n} videos · ${f.size}</div></div>
+      </div>`).join("")}<div style="height:90px"></div>
+      </div>` + navbar();
+  const fab=document.createElement("button"); fab.className="fab"; fab.style.bottom="92px"; fab.innerHTML=ic("play_arrow","fill")+"Resume"; fab.onclick=()=>openPlayer(1); screen.appendChild(fab);
+  bindLongPress();
+}
+function openFolder(i){ S.folder=i; go("videos"); }
+
+function videoListHTML(list){
+  if(S.grid) return `<div class="grid">${list.map((v,i)=>`
+    <div class="cell" onclick="openPlayer(${i})" oncontextmenu="event.preventDefault();videoSheet(${i})" data-lp="videoSheet(${i})">
+      <div class="thumb" style="${thumbBg(i)}"><span class="dur">${v.d}</span>${v.p?`<div class="prog"><i style="width:${v.p*100}%"></i></div>`:""}</div>
+      <div class="title2">${v.t}</div></div>`).join("")}</div>`;
+  return list.map((v,i)=>`
+    <div class="row" style="padding:8px 4px 8px 16px" onclick="openPlayer(${i})" oncontextmenu="event.preventDefault();videoSheet(${i})" data-lp="videoSheet(${i})">
+      <div class="thumb" style="${thumbBg(i)}"><span class="dur">${v.d}</span>${v.p?`<div class="prog"><i style="width:${v.p*100}%"></i></div>`:""}</div>
+      <div class="grow"><div class="title2">${v.t}</div><div class="meta">${v.nw?'<span class="badge">NEW</span>':""}${v.s} · ${v.r}</div></div>
+      <button class="icon-btn" onclick="event.stopPropagation();videoSheet(${i})">${ic("more_vert")}</button>
+    </div>`).join("");
+}
+function Videos(){
+  const f=folders[S.folder??0];
+  screen.innerHTML = statusbar() + topbar(f.name,{back:"go('folders',true)",actions:`
+      <button class="icon-btn" onclick="openPlayer(0)">${ic("play_arrow")}</button>
+      <button class="icon-btn" onclick="sortDialog()">${ic("sort")}</button>
+      <button class="icon-btn" onclick="S.grid=!S.grid;render()">${ic(S.grid?"view_list":"grid_view")}</button>`}) +
+    `<div class="content">${videoListHTML(videos)}</div>`;
+  bindLongPress();
+}
+function Search(){
+  screen.innerHTML = statusbar() + `<div class="topbar sub"><button class="icon-btn" onclick="go('folders',true)">${ic("arrow_back")}</button>
+     <div class="field" style="flex:1;margin:0 12px 0 0;height:48px"><input id="q" placeholder="Search videos" value="${S.query}"></div></div>
+     <div class="content" id="results"></div>`;
+  const q=$("#q"); q.focus();
+  const upd=()=>{ S.query=q.value; const r=videos.filter(v=>q.value.trim()&&v.t.toLowerCase().includes(q.value.trim().toLowerCase()));
+    $("#results").innerHTML = !q.value.trim()? `<div class="empty">${ic("search")}<b>Search all your videos</b>Try "episode"</div>` : r.length? videoListHTML(r) : `<div class="empty">${ic("search")}<b>No matches</b></div>`; };
+  q.oninput=upd; upd();
+}
+function Playlists(){
+  screen.innerHTML = statusbar() + topbar("Playlists") + `<div class="content">${S.playlists.length? S.playlists.map((p,i)=>`
+     <div class="row" onclick="openPlayer(0)"><div class="folder-ic" style="width:48px;height:48px">${ic("playlist_play")}</div>
+     <div class="grow"><div class="title">${p.name}</div><div class="meta">${p.n} videos</div></div>
+     <button class="icon-btn" onclick="event.stopPropagation();S.playlists.splice(${i},1);render()">${ic("delete")}</button></div>`).join("")
+     : `<div class="empty">${ic("playlist_play")}<b>No playlists yet</b>Tap + to create one, or long-press any video and choose "Add to playlist".</div>`}</div>` + navbar();
+  const fab=document.createElement("button"); fab.className="fab round"; fab.style.bottom="92px"; fab.innerHTML=ic("add"); fab.onclick=()=>{S.playlists.unshift({name:"New playlist "+(S.playlists.length+1),n:0});render();}; screen.appendChild(fab);
+}
+function Network(){
+  screen.innerHTML = statusbar() + topbar("Network") + `<div class="content" style="padding-top:4px">
+    <div style="padding:0 16px 8px"><div class="title" style="font-weight:500">Play a stream</div><div class="meta">http(s), HLS (.m3u8), DASH (.mpd), RTSP or smb:// links</div></div>
+    <div class="field"><input placeholder="https://example.com/video.m3u8"><button class="icon-btn" onclick="openPlayer(0)">${ic("play_arrow")}</button></div>
+    <div style="display:flex;align-items:center;padding:18px 4px 0 16px"><div class="grow" style="font-weight:500;font-size:14px">Recent</div><button class="tbtn" onclick="S.urls=[];render()">Clear</button></div>
+    ${S.urls.map(u=>`<div class="row" onclick="openPlayer(0)">${ic("history")}<div class="grow title" style="font-size:14px">${u}</div>${ic("close")}</div>`).join("")}
+    <div style="height:1px;background:var(--divider);margin:14px 16px"></div>
+    <div style="display:flex;align-items:center;padding:0 4px 0 16px"><div class="grow"><div style="font-weight:500">Network shares (SMB)</div><div class="meta">Windows shared folders, NAS drives, routers with USB storage</div></div><button class="icon-btn" onclick="toast('Add network share dialog')">${ic("add")}</button></div>
+    ${S.shares.map(s=>`<div class="row" onclick="toast('Browsing \\\\\\\\${s.host}\\\\${s.share}')"><span class="ms" style="color:var(--accent)">computer</span><div class="grow"><div class="title">${s.name}</div><div class="meta">\\\\${s.host}\\${s.share}</div></div><button class="icon-btn">${ic("edit")}</button></div>`).join("")}
+  </div>` + navbar();
+}
+function Settings(){
+  const T=(k,t,sub="")=>`<div class="set-row" onclick="S.settings.${k}=!S.settings.${k};render()"><div class="grow"><div>${t}</div>${sub?`<div class="sub">${sub}</div>`:""}</div><div class="switch ${S.settings[k]?"on":""}"></div></div>`;
+  const C=(t,v,fn="")=>`<div class="set-row" onclick="${fn||`toast('${t}')`}"><div class="grow"><div>${t}</div><div class="sub">${v}</div></div></div>`;
+  screen.innerHTML = statusbar() + topbar("Settings") + `<div class="content">
+    <div class="section">Appearance</div>
+    ${C("Theme",{dark:"Dark",amoled:"Black (AMOLED)",light:"Light"}[S.theme],"themeDialog()")}
+    <div style="padding:10px 16px"><div>Accent colour</div><div style="display:flex;gap:12px;margin-top:10px">${accents.map(([n,c],i)=>`<button onclick="setAccent(${i})" style="width:36px;height:36px;border-radius:50%;background:${c};display:grid;place-items:center;border:2px solid ${i===S.accent?"var(--text)":"transparent"}">${i===S.accent?`<span class="ms" style="color:#fff;font-size:20px">check</span>`:""}</button>`).join("")}</div></div>
+    <div class="section">Playback</div>
+    ${C("Decoder","HW: hardware (fast, saves battery)")}
+    ${T("resume","Resume where you left off")}${T("next","Auto-play next video")}
+    ${T("bg","Background play","Keep playing audio when you leave the app")}
+    ${T("pip","Picture-in-picture on Home","Shrink the video to a floating window when you press Home")}
+    ${T("rotate","Rotate to match video","Landscape videos open in landscape")}
+    ${T("boost","Volume boost up to 200%")}${T("keepBright","Remember brightness")}
+    <div style="padding:6px 16px"><div style="display:flex"><div class="grow">Seek step</div><span style="color:var(--accent)">10 s</span></div><input type="range" min="5" max="30" value="10"></div>
+    ${C("Preferred audio language","Video default")}
+    <div class="section">Gestures</div>
+    ${T("gB","Swipe left side for brightness")}${T("gV","Swipe right side for volume")}${T("gS","Swipe sideways to seek")}${T("gD","Double-tap to skip")}${T("gP","Pinch to zoom")}
+    <div class="section">Subtitles</div>
+    ${T("autoSubs","Auto-load subtitle files","Loads Movie.srt when you play Movie.mp4")}
+    ${C("All files access","Needed on Android 11+ to find subtitle files next to videos")}
+    <div class="section">Library</div>
+    ${T("dot",'Show folders starting with "."')}${C("Hidden folders","0 hidden")}${C("Private folder PIN","Not set","go('vault')")}${C("Clear watch history","Forget resume positions")}
+    <div class="section">About</div>${C("JC Player 1.0","No ads, no tracking. Built on Media3/ExoPlayer and FFmpeg.")}
+    <div style="height:20px"></div></div>` + navbar();
+}
+function Vault(){
+  if(S.unlocked){
+    screen.innerHTML = statusbar()+topbar("Private folder",{back:"S.unlocked=false;go('folders',true)"})+`<div class="content">
+      <div class="row"><div class="folder-ic" style="width:48px;height:48px">${ic("folder","fill")}</div><div class="grow"><div class="title">Personal</div><div class="meta">6 videos · 1.1 GB</div></div><button class="icon-btn">${ic("lock_open")}</button></div></div>`;
+    return;
+  }
+  screen.innerHTML = statusbar()+topbar("Private folder",{back:"go('folders',true)"})+`<div class="content"><div class="pin">
+    <span class="ms" style="font-size:48px;color:var(--accent)">lock</span><div style="font-size:22px">Enter PIN</div>
+    <div class="dots">${[0,1,2,3].map(i=>`<i class="${S.pin.length>i?"on":""}"></i>`).join("")}</div>
+    <div class="keypad">${[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map(k=>k===""?"<span></span>":`<button onclick="pinKey('${k}')">${k}</button>`).join("")}</div></div></div>`;
+}
+function pinKey(k){ if(k==="⌫") S.pin=S.pin.slice(0,-1); else S.pin+=k; if(S.pin.length>=4){S.pin="";S.unlocked=true;} render(); }
+
+// ---------------- sheets & dialogs ----------------
+function overlay(html,dialog){ const o=document.createElement("div"); o.className="scrim"+(dialog?" dialog-wrap":""); o.innerHTML=html; o.onclick=e=>{if(e.target===o)o.remove()}; screen.appendChild(o); return o; }
+function sheetItem(icon,label,fn="toast('"+label+"')"){ return `<div class="item" onclick="this.closest('.scrim').remove();${fn}">${ic(icon)}${label}</div>`; }
+function folderSheet(i){ const f=folders[i]; overlay(`<div class="sheet"><div class="handle"></div><div class="head">${f.name}<div class="meta" style="font-weight:400">${f.path}</div></div>
+  ${sheetItem("play_arrow","Play all","openPlayer(0)")}${sheetItem("visibility_off","Hide folder","toast('Folder hidden. Unhide it in Settings.')")}${sheetItem("lock","Move to Private folder","toast('Moved to Private folder')")}</div>`); }
+function videoSheet(i){ const v=videos[i]; overlay(`<div class="sheet"><div class="handle"></div><div class="head">${v.t}</div>
+  ${sheetItem("play_arrow","Play",`openPlayer(${i})`)}${sheetItem("playlist_add","Add to playlist")}${sheetItem("share","Share")}${sheetItem("drive_file_rename_outline","Rename")}${sheetItem("delete","Delete")}${sheetItem("info","Properties")}</div>`); }
+function sortDialog(){ const o=overlay(`<div class="dialog"><h3>Sort by</h3>${["Name","Date","Size","Duration"].map(s=>`<div class="radio ${S.sort===s?"on":""}" data-s="${s}"><i></i>${s}</div>`).join("")}
+  <div style="height:1px;background:var(--divider);margin:8px 0"></div>${[["Ascending",true],["Descending",false]].map(([l,a])=>`<div class="radio ${S.asc===a?"on":""}" data-a="${a}"><i></i>${l}</div>`).join("")}
+  <div class="actions"><button class="tbtn" onclick="this.closest('.scrim').remove()">Done</button></div></div>`,true);
+  o.querySelectorAll("[data-s]").forEach(r=>r.onclick=()=>{S.sort=r.dataset.s;o.remove();sortDialog()});
+  o.querySelectorAll("[data-a]").forEach(r=>r.onclick=()=>{S.asc=r.dataset.a==="true";o.remove();sortDialog()}); }
+function themeDialog(){ const o=overlay(`<div class="dialog"><h3>Theme</h3>${[["dark","Dark"],["amoled","Black (AMOLED)"],["light","Light"]].map(([k,l])=>`<div class="radio ${S.theme===k?"on":""}" data-k="${k}"><i></i>${l}</div>`).join("")}</div>`,true);
+  o.querySelectorAll("[data-k]").forEach(r=>r.onclick=()=>{o.remove();setTheme(r.dataset.k)}); }
+function moreMenu(){ overlay(`<div class="sheet"><div class="handle"></div>${sheetItem("lock","Private folder","go('vault')")}${sheetItem("refresh","Refresh","toast('Library refreshed')")}</div>`); }
+
+let lpTimer;
+function bindLongPress(){ screen.querySelectorAll("[data-lp]").forEach(el=>{
+  el.addEventListener("pointerdown",()=>{ lpTimer=setTimeout(()=>{ el.dataset.lpFired="1"; new Function(el.dataset.lp)(); },550); });
+  ["pointerup","pointerleave","pointercancel"].forEach(e=>el.addEventListener(e,()=>clearTimeout(lpTimer)));
+  el.addEventListener("click",e=>{ if(el.dataset.lpFired){ e.stopImmediatePropagation(); delete el.dataset.lpFired; } },true);
+}); }
+
+// ---------------- player ----------------
+const P = {};
+function openPlayer(i){ P.index=i; go("player"); }
+function stopPlayer(){ if(P.timer){clearInterval(P.timer);P.timer=null;} if(P.video){P.video.pause();P.video=null;} }
+function fmt(s){ s=Math.max(0,Math.floor(s)); const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60; return h?`${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}`:`${m}:${String(x).padStart(2,"0")}`; }
+
+function Player(){
+  Object.assign(P,{controls:true,locked:false,panel:null,speed:1,zoom:1,bright:1,vol:60,bg:S.settings.bg,abA:null,abB:null,subDelay:0,aspect:0,lastTouch:Date.now(),remaining:false,eq:[0,0,0,0,0],eqOn:false,sleep:"Off",audio:0,sub:1});
+  const v = videos[P.index] || videos[0];
+  screen.innerHTML = `<div class="player" id="pl">
+    <video id="vid" src="sample.mp4" loop playsinline></video>
+    <div class="subs" id="subs"></div>
+    <div class="gest" id="gest"></div>
+    <div class="hud" id="hud"></div>
+    <div class="ctrl" id="ctrl">
+      <div class="p-top">
+        <button class="icon-btn p-ic" onclick="go('videos')">${ic("arrow_back")}</button>
+        <div class="t">${v.t}</div>
+        <button class="icon-btn p-ic" onclick="toast('Looking for Chromecast devices…')">${ic("cast")}</button>
+        <button class="icon-btn p-ic" onclick="panel('audio')">${ic("audiotrack")}</button>
+        <button class="icon-btn p-ic" onclick="panel('subs')">${ic("subtitles")}</button>
+        <button class="icon-btn p-ic" onclick="panel('more')">${ic("more_vert")}</button>
+      </div>
+      <div class="p-center">
+        <button class="rb" onclick="prev()">${ic("skip_previous","fill")}</button>
+        <button class="rb" onclick="seekBy(-10)">${ic("replay_10")}</button>
+        <button class="rb big" id="pp" onclick="togglePlay()">${ic("pause","fill")}</button>
+        <button class="rb" onclick="seekBy(10)">${ic("forward_10")}</button>
+        <button class="rb ${P.index>=videos.length-1?"dis":""}" onclick="next()">${ic("skip_next","fill")}</button>
+      </div>
+      <div class="p-bottom">
+        <div class="seek"><span id="cur">0:00</span><div class="track" id="track"><div class="buf" style="width:100%"></div><div class="pos" id="posbar"></div><div class="knob" id="knob"></div></div><span id="dur" style="cursor:pointer" onclick="P.remaining=!P.remaining">0:00</span></div>
+        <div class="p-row">
+          <button class="icon-btn p-ic" onclick="lock()">${ic("lock")}</button>
+          <button class="icon-btn p-ic" onclick="cycleAspect()">${ic("aspect_ratio")}</button>
+          <button class="icon-btn p-ic" onclick="toast('Rotated to portrait')">${ic("screen_rotation")}</button>
+          <div class="sp"></div>
+          <button class="speed-btn p-ic" onclick="panel('speed')">${ic("speed")}<span id="spd">1x</span></button>
+          <button class="icon-btn p-ic ${P.bg?"on":""}" id="bgbtn" onclick="P.bg=!P.bg;this.classList.toggle('on',P.bg);toast(P.bg?'Background play on':'Background play off')">${ic("headphones")}</button>
+          <button class="icon-btn p-ic" onclick="toast('Picture-in-picture')">${ic("picture_in_picture_alt")}</button>
+        </div>
+      </div>
+    </div>
+    ${v.p>0&&v.p<1?`<div class="resume" id="resume">Resumed at ${fmt(v.p*10)}<button class="tbtn" onclick="P.video.currentTime=0;this.parentElement.remove()">Start over</button></div>`:""}
+    <div id="panelHost"></div>
+  </div>`;
+  const vid=$("#vid"); P.video=vid;
+  vid.muted=false; vid.volume=.6;
+  if(v.p>0&&v.p<1) vid.addEventListener("loadedmetadata",()=>vid.currentTime=vid.duration*v.p,{once:true});
+  vid.play().catch(()=>{ vid.muted=true; vid.play(); });
+  setTimeout(()=>$("#resume")?.remove(),5000);
+  P.timer=setInterval(tick,200);
+  bindGestures();
+  bindSeekbar();
+}
+function tick(){
+  const vid=P.video; if(!vid) return;
+  const d=vid.duration||0, t=vid.currentTime;
+  $("#cur").textContent=fmt(t); $("#dur").textContent=P.remaining?"-"+fmt(d-t):fmt(d);
+  const f=d?t/d*100:0; $("#posbar").style.width=f+"%"; $("#knob").style.left=f+"%";
+  $("#pp").innerHTML=ic(vid.paused?"play_arrow":"pause","fill");
+  const st=t-P.subDelay/1000, cue=P.sub?subsCues.find(c=>st>=c[0]&&st<=c[1]):null;
+  $("#subs").innerHTML=cue?`<span>${cue[2]}</span>`:"";
+  if(P.abA!=null&&P.abB!=null&&t>=P.abB) vid.currentTime=P.abA;
+  const ctrl=$("#ctrl");
+  if(P.controls && !vid.paused && !P.panel && Date.now()-P.lastTouch>3500) P.controls=false;
+  ctrl.classList.toggle("hidden",!P.controls||P.locked);
+}
+function poke(){ P.controls=true; P.lastTouch=Date.now(); }
+function togglePlay(){ P.video.paused?P.video.play():P.video.pause(); poke(); }
+function seekBy(s){ P.video.currentTime=Math.min(Math.max(0,P.video.currentTime+s),P.video.duration||0); poke(); }
+function prev(){ if(P.video.currentTime>5||P.index===0) P.video.currentTime=0; else openPlayer(P.index-1); }
+function next(){ if(P.index<videos.length-1) openPlayer(P.index+1); }
+function hud(l1,l2,level){ const h=$("#hud"); h.innerHTML=`<div class="l1">${l1}</div>${l2?`<div class="l2">${l2}</div>`:""}${level!=null?`<div class="bar"><i style="width:${Math.min(100,level*100)}%;${l1.startsWith("Volume")&&P.vol>100?"background:#FF8A3D":""}"></i></div>`:""}`; h.classList.add("show"); clearTimeout(P.hudT); P.hudT=setTimeout(()=>h.classList.remove("show"),700); }
+const aspects=["Fit","Stretch","Crop","16:9","4:3","21:9"];
+function cycleAspect(){ P.aspect=(P.aspect+1)%aspects.length; const v=P.video; const a=aspects[P.aspect];
+  v.style.objectFit = a==="Fit"?"contain":a==="Crop"?"cover":"fill";
+  if(a.includes(":")){ const [w,h]=a.split(":").map(Number); v.style.aspectRatio=w/h; v.style.width="auto"; v.style.height="100%"; v.style.left="50%"; v.style.transform=`translateX(-50%) scale(${P.zoom})`; }
+  else { v.style.aspectRatio=""; v.style.width="100%"; v.style.height="100%"; v.style.left="0"; v.style.transform=`scale(${P.zoom})`; }
+  hud(a); poke(); }
+function applyZoom(){ const a=aspects[P.aspect]; P.video.style.transform=(a.includes(":")?"translateX(-50%) ":"")+`scale(${P.zoom})`; }
+function lock(){ P.locked=true; P.panel=null; $("#panelHost").innerHTML=""; showLockBtn(); }
+function showLockBtn(){ let b=$("#lockbtn"); if(!b){ b=document.createElement("button"); b.id="lockbtn"; b.className="lock-btn"; b.innerHTML=ic("lock_open"); b.onclick=e=>{e.stopPropagation();P.locked=false;b.remove();poke();}; $("#pl").appendChild(b);} clearTimeout(P.lockT); P.lockT=setTimeout(()=>b.remove(),2500); }
+
+function bindSeekbar(){ const tr=$("#track"); const set=e=>{ const r=tr.getBoundingClientRect(); P.video.currentTime=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width))*(P.video.duration||0); poke(); };
+  tr.addEventListener("pointerdown",e=>{ set(e); tr.setPointerCapture(e.pointerId); tr.onpointermove=set; });
+  tr.addEventListener("pointerup",()=>tr.onpointermove=null); }
+
+function bindGestures(){
+  const g=$("#gest"); let start=null, mode=null, lastClick=0, clickT;
+  g.addEventListener("pointerdown",e=>{ if(P.locked) return; start={x:e.clientX,y:e.clientY,t:P.video.currentTime,b:P.bright,v:P.vol}; mode=null; g.setPointerCapture(e.pointerId); });
+  g.addEventListener("pointermove",e=>{ if(!start) return; const r=g.getBoundingClientRect(); const dx=e.clientX-start.x, dy=e.clientY-start.y;
+    if(!mode && Math.hypot(dx,dy)>8){ mode=Math.abs(dx)>Math.abs(dy)?(S.settings.gS?"seek":"none"):(start.x-r.left<r.width/2?(S.settings.gB?"bright":"none"):(S.settings.gV?"vol":"none")); }
+    if(mode==="seek"){ const d=P.video.duration||0; const tgt=Math.min(d,Math.max(0,start.t+dx/r.width*30)); P.video.currentTime=tgt; const diff=tgt-start.t; hud(`${diff>=0?"+":"-"}${fmt(Math.abs(diff))}`,`${fmt(tgt)} / ${fmt(d)}`); }
+    if(mode==="bright"){ P.bright=Math.min(1,Math.max(.05,start.b-dy/(r.height*.8))); P.video.style.filter=`brightness(${P.bright})`; hud(`☀ Brightness ${Math.round(P.bright*100)}%`,"",P.bright); }
+    if(mode==="vol"){ const max=S.settings.boost?200:100; P.vol=Math.round(Math.min(max,Math.max(0,start.v-dy/(r.height*.8)*100))); P.video.volume=Math.min(1,P.vol/100); hud(`🔊 Volume ${P.vol}%`,"",P.vol/max); }
+  });
+  g.addEventListener("pointerup",e=>{ const wasDrag=!!mode; start=null; mode=null; if(wasDrag||P.locked){ if(P.locked) showLockBtn(); return; }
+    const now=Date.now(); const r=g.getBoundingClientRect(); const x=e.clientX-r.left;
+    if(now-lastClick<300 && S.settings.gD){ clearTimeout(clickT); lastClick=0;
+      if(x<r.width/3){ seekBy(-10); P.tapTotal=(now-(P.lastTapAt||0)<1200&&P.tapSide<0?P.tapTotal:0)+10; P.tapSide=-1; P.lastTapAt=now; hud(`« -${P.tapTotal}s`); }
+      else if(x>r.width*2/3){ seekBy(10); P.tapTotal=(now-(P.lastTapAt||0)<1200&&P.tapSide>0?P.tapTotal:0)+10; P.tapSide=1; P.lastTapAt=now; hud(`» +${P.tapTotal}s`); }
+      else togglePlay();
+      return; }
+    lastClick=now;
+    clickT=setTimeout(()=>{ if(P.panel){ closePanel(); return; } P.controls=!P.controls; P.lastTouch=Date.now(); },250);
+  });
+  g.addEventListener("wheel",e=>{ if(!S.settings.gP||P.locked) return; e.preventDefault(); P.zoom=Math.min(6,Math.max(.25,P.zoom*(e.deltaY<0?1.08:.93))); applyZoom(); hud(`Zoom ${Math.round(P.zoom*100)}%`); },{passive:false});
+}
+
+// ---------------- side panels ----------------
+function closePanel(){ P.panel=null; $("#panelHost").innerHTML=""; }
+function panel(name){
+  P.panel=name; poke();
+  const host=$("#panelHost");
+  const row=(t,sel,sub,fn)=>`<div class="prow ${sel?"sel":""}" onclick="${fn}"><div><div>${t}</div>${sub?`<div class="s">${sub}</div>`:""}</div></div>`;
+  let title="", body="";
+  if(name==="audio"){ title="Audio track";
+    body=[["English · AAC · Stereo"],["Hindi · AC3 · 5.1"],["Tamil · EAC3 · 5.1"]].map(([l],i)=>row(l,P.audio===i,"",`P.audio=${i};closePanel();toast('Audio: ${l.split(" ·")[0]}')`)).join("")+
+      `<div class="hr"></div>`+row("Equalizer",false,"","panel('eq')")+row("Disable audio",false,"","closePanel()"); }
+  if(name==="subs"){ title="Subtitles";
+    body=row("Off",P.sub===0,"","P.sub=0;closePanel()")+row("English · built-in",P.sub===2,"","P.sub=2;closePanel()")+row("Sample Clip 2.srt · file",P.sub===1,"","P.sub=1;closePanel()")+
+      row("Load subtitle file…",false,"SRT, ASS/SSA, VTT, TTML","toast('File picker opens here')")+`<div class="hr"></div><div>Sync (delay)</div>
+      <div class="stepper"><button onclick="sd(-500)">-0.5s</button><button onclick="sd(-100)">-0.1s</button><span id="sdv">${(P.subDelay/1000>=0?"+":"")+(P.subDelay/1000).toFixed(1)}s</span><button onclick="sd(100)">+0.1s</button><button onclick="sd(500)">+0.5s</button></div>`+
+      row("Style: size, colour, position",false,"","panel('style')"); }
+  if(name==="style"){ title="Subtitle style";
+    body=`<div>Size</div><input type="range" min="12" max="44" value="20" oninput="setSubSize(this.value)" id="ssz">
+      <div style="margin-top:6px">Colour</div><div style="display:flex;gap:10px;margin:8px 0">${["#fff","#FFEB3B","#8BE9FD","#69F0AE","#FF80AB","#FFAB40"].map(c=>`<button onclick="setSubColor('${c}')" style="width:32px;height:32px;border-radius:50%;background:${c}"></button>`).join("")}</div>
+      <div>Background</div><div class="chips" style="margin:8px 0">${["None","Shaded","Black"].map((l,i)=>`<span class="chip ${i===0?"sel":""}" onclick="setSubBg(${i},this)">${l}</span>`).join("")}</div>
+      <div style="display:flex;align-items:center;padding:6px 0"><div class="grow">Outline</div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+      <div style="display:flex;align-items:center;padding:6px 0"><div class="grow">Bold</div><div class="switch" onclick="this.classList.toggle('on');document.getElementById('subs').style.fontWeight=this.classList.contains('on')?700:400"></div></div>
+      <div>Distance from bottom</div><input type="range" min="0" max="40" value="12" oninput="document.getElementById('subs').style.bottom=this.value+'%'">`; }
+  if(name==="speed"){ title="Playback speed";
+    body=`<div style="text-align:center;font-size:28px" id="spv">${P.speed.toFixed(2)}x</div><input type="range" min="0.25" max="4" step="0.05" value="${P.speed}" oninput="setSpeed(+this.value)">
+      <div class="chips">${[0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5,3,4].map(s=>`<span class="chip ${s===P.speed?"sel":""}" onclick="setSpeed(${s});panel('speed')">${s}x</span>`).join("")}</div>
+      <div class="s" style="font-size:12px;opacity:.6;margin-top:10px">Pitch is kept natural at every speed.</div>`; }
+  if(name==="more"){ title="More";
+    const ab=P.abA==null?"A–B repeat: set point A":P.abB==null?"A–B repeat: set point B":"A–B repeat: turn off";
+    body=row("Decoder: HW",false,"Tap to switch to SW (software)","toast('SW decoder')")+row("Playback speed",false,P.speed.toFixed(2)+"x","panel('speed')")+row("Equalizer",false,"","panel('eq')")+
+      row("Sleep timer",false,P.sleep,"panel('sleep')")+row(ab,P.abB!=null,P.abA!=null?`A ${fmt(P.abA)}${P.abB!=null?" → B "+fmt(P.abB):""}`:"","abTap()")+
+      row("Aspect ratio: "+aspects[P.aspect],false,"","cycleAspect();panel('more')")+(P.zoom!==1?row(`Reset zoom (${Math.round(P.zoom*100)}%)`,false,"","P.zoom=1;applyZoom();panel('more')"):"")+
+      row("Background play",P.bg,"Keep audio playing when you leave the app","P.bg=!P.bg;document.getElementById('bgbtn').classList.toggle('on',P.bg);panel('more')")+
+      row("Kids lock",false,"Locks the screen and pins the app","closePanel();lock();toast('Kids lock on')")+row("Video info",false,"","panel('info')"); }
+  if(name==="eq"){ title="Equalizer";
+    const bands=["60","230","910","3.6k","14k"];
+    body=`<div style="display:flex;align-items:center;padding:4px 0"><div class="grow">Enabled</div><div class="switch ${P.eqOn?"on":""}" onclick="P.eqOn=!P.eqOn;this.classList.toggle('on')"></div></div>
+      <div style="margin:8px 0 6px">Presets</div><div class="chips">${["Normal","Classical","Dance","Flat","Folk","Heavy Metal","Hip Hop","Jazz","Pop","Rock","Custom"].map((p,i)=>`<span class="chip ${i===10?"sel":""}" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">${p}</span>`).join("")}</div>
+      <div style="margin:12px 0 4px">Bands</div>${bands.map((b,i)=>`<div class="eq-row"><label>${b}</label><input type="range" min="-15" max="15" value="${P.eq[i]}" oninput="P.eq[${i}]=+this.value;this.nextElementSibling.textContent=(this.value>0?'+':'')+this.value"><b>${P.eq[i]>0?"+":""}${P.eq[i]}</b></div>`).join("")}
+      <div style="margin-top:8px">Bass boost</div><input type="range" min="0" max="1000" value="0">`; }
+  if(name==="sleep"){ title="Sleep timer";
+    body=`<div class="s" style="opacity:.7;margin-bottom:8px">${P.sleep}</div>`+["Off","15 minutes","30 minutes","45 minutes","60 minutes","90 minutes","120 minutes","End of this video"].map(l=>row(l,P.sleep===l||(l==="Off"&&P.sleep==="Off"),"",`P.sleep='${l}';closePanel();toast('${l==="Off"?"Sleep timer off":"Sleep timer: "+l}')`)).join(""); }
+  if(name==="info"){ title="Video info";
+    const v=P.video; const info=[["Title",videos[P.index].t],["Source","content://media/external/video/media/"+(1024+P.index)],["Duration",fmt(v.duration||0)],["Video",`${v.videoWidth}×${v.videoHeight} · 30.00 fps · avc1.4D401F · 1840 kbps`],["Video decoder","c2.exynos.h264.decoder"],["Audio","audio/mp4a-latm · 2 ch · 44100 Hz"],["Audio decoder","c2.android.aac.decoder"],["Decoder mode","HW"]];
+    body=info.map(([l,x])=>`<div style="margin-bottom:10px"><div class="s" style="font-size:12px;opacity:.6">${l}</div><div style="font-size:14px;word-break:break-all">${x}</div></div>`).join(""); }
+  host.innerHTML=`<div class="panel-scrim" onclick="if(event.target===this)closePanel()"><div class="panel"><h4>${title}</h4>${body}</div></div>`;
+}
+function sd(ms){ P.subDelay+=ms; const el=$("#sdv"); if(el) el.textContent=(P.subDelay>=0?"+":"")+(P.subDelay/1000).toFixed(1)+"s"; }
+function setSpeed(s){ P.speed=Math.round(s*100)/100; P.video.playbackRate=P.speed; $("#spd").textContent=(+P.speed.toFixed(2))+"x"; const el=$("#spv"); if(el) el.textContent=P.speed.toFixed(2)+"x"; }
+function abTap(){ const t=P.video.currentTime; if(P.abA==null){P.abA=t;toast("Point A set. Tap again for point B.");} else if(P.abB==null){ if(t>P.abA+.5){P.abB=t;toast("Repeating A–B");} else toast("B must be after A"); } else {P.abA=P.abB=null;toast("A–B repeat off");} panel("more"); }
+function setSubSize(px){ const st=document.getElementById("subSize")||document.head.appendChild(Object.assign(document.createElement("style"),{id:"subSize"})); st.textContent=`.subs span{font-size:${px}px!important}`; }
+function setSubColor(c){ const st=document.getElementById("subStyle")||document.head.appendChild(Object.assign(document.createElement("style"),{id:"subStyle"})); st.textContent=`.subs span{color:${c}!important}`; }
+function setSubBg(i,el){ el.parentElement.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel")); el.classList.add("sel"); const st=document.getElementById("subBg")||document.head.appendChild(Object.assign(document.createElement("style"),{id:"subBg"})); st.textContent=i?`.subs span{background:${i===1?"rgba(0,0,0,.6)":"#000"};padding:0 6px}`:""; }
+
+// ---------------- theme controls ----------------
+function setTheme(t){ S.theme=t; document.documentElement.dataset.theme=t; renderSide(); if(S.screen!=="player") render(); }
+function setAccent(i){ S.accent=i; document.documentElement.style.setProperty("--accent",accents[i][1]); renderSide(); if(S.screen==="settings") render(); }
+function renderSide(){
+  $("#themeSeg").innerHTML=[["dark","Dark"],["amoled","AMOLED"],["light","Light"]].map(([k,l])=>`<button class="${S.theme===k?"on":""}" onclick="setTheme('${k}')">${l}</button>`).join("");
+  $("#accentSeg").innerHTML=accents.map(([n,c],i)=>`<button class="sw ${S.accent===i?"on":""}" title="${n}" style="background:${c}" onclick="setAccent(${i})"></button>`).join("");
+}
+renderSide(); if(location.hash==="#player"){S.folder=0;openPlayer(1);} else render();
+</script>
+</body>
+</html>
