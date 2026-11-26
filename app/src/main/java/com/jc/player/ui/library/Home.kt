@@ -194,10 +194,7 @@ fun FoldersScreen(
                             .padding(horizontal = 16.dp, vertical = 9.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Box(
-                            Modifier.size(52.dp).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), RoundedCornerShape(14.dp)),
-                            contentAlignment = Alignment.Center,
-                        ) { Icon(Icons.Default.Folder, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(30.dp)) }
+                        com.jc.player.ui.common.FolderThumbnail(folder.videos, Modifier.size(width = 88.dp, height = 56.dp))
                         Column(Modifier.padding(start = 14.dp).weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(folder.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis,

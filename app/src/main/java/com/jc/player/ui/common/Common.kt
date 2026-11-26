@@ -4,7 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -151,4 +156,56 @@ fun TextInputDialog(
         confirmButton = { TextButton(onClick = { if (text.isNotBlank()) onConfirm(text.trim()) }) { Text(confirm) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
+}
+
+/** A single video frame, cropped to fill. */
+@Composable
+private fun Frame(uri: Uri, modifier: Modifier) {
+    val context = LocalContext.current
+    AsyncImage(
+        model = ImageRequest.Builder(context).data(uri).videoFrameMillis(2000).build(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier.background(Color(0xFF2A2D35)),
+    )
+}
+
+/**
+ * Folder cover made from the newest videos inside it:
+ * 1 video = full frame, 2 = side by side, 3 = one large + two small, 4+ = 2x2 grid.
+ */
+@Composable
+fun FolderThumbnail(videos: List<com.jc.player.data.VideoItem>, modifier: Modifier = Modifier) {
+    val picks = remember(videos) { videos.sortedByDescending { it.dateAddedSec }.take(4).map { it.uri } }
+    val gap = 1.5.dp
+    Box(modifier.clip(RoundedCornerShape(10.dp)).background(Color(0xFF2A2D35))) {
+        when (picks.size) {
+            0 -> Icon(Icons.Default.Folder, null, Modifier.align(Alignment.Center).size(28.dp),
+                tint = MaterialTheme.colorScheme.primary)
+            1 -> Frame(picks[0], Modifier.fillMaxSize())
+            2 -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(gap)) {
+                Frame(picks[0], Modifier.weight(1f).fillMaxHeight())
+                Frame(picks[1], Modifier.weight(1f).fillMaxHeight())
+            }
+            3 -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(gap)) {
+                Frame(picks[0], Modifier.weight(1f).fillMaxHeight())
+                Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(gap)) {
+                    Frame(picks[1], Modifier.weight(1f).fillMaxWidth())
+                    Frame(picks[2], Modifier.weight(1f).fillMaxWidth())
+                }
+            }
+            else -> Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
+                for (row in 0..1) Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(gap)) {
+                    Frame(picks[row * 2], Modifier.weight(1f).fillMaxHeight())
+                    Frame(picks[row * 2 + 1], Modifier.weight(1f).fillMaxHeight())
+                }
+            }
+        }
+        if (picks.isNotEmpty()) Box(
+            Modifier.align(Alignment.BottomStart).padding(4.dp)
+                .background(Color(0xB3000000), RoundedCornerShape(5.dp)).padding(horizontal = 4.dp, vertical = 2.dp)
+        ) {
+            Icon(Icons.Default.Folder, null, Modifier.size(12.dp), tint = Color.White)
+        }
+    }
 }

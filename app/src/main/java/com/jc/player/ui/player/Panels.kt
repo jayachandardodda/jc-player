@@ -47,6 +47,8 @@ import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.RepeatOne
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Subtitles
@@ -126,6 +128,9 @@ fun Panels(c: PlayerController, activity: PlayerActivity, s: AppSettings) {
                 ) { c.abRepeatTap() }
                 PanelRow("Aspect ratio: ${c.aspect.label}") { c.cycleAspect() }
                 if (c.zoom != 1f) PanelRow("Reset zoom (${(c.zoom * 100).toInt()}%)") { c.resetZoom() }
+                PanelRow("Repeat: ${c.repeatLabel()}", c.repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF,
+                    sub = "Off, then All, then This video") { c.cycleRepeat() }
+                PanelRow("Shuffle", c.shuffle, sub = "Play the folder or playlist in random order") { c.toggleShuffle() }
                 PanelRow("Night mode", c.nightMode, sub = "Louder dialogue, softer explosions") { c.toggleNightMode() }
                 PanelRow("Screenshot", sub = "Saved to Pictures/JC Player") { close(); c.takeScreenshot() }
                 PanelRow("Background play", c.backgroundPlay, sub = "Keep audio playing when you leave the app") {
@@ -360,6 +365,9 @@ fun QuickDrawer(c: PlayerController, activity: PlayerActivity) {
                 Tile(I.Audiotrack, "Audio") { c.panel = Panel.AUDIO }
                 Tile(I.Subtitles, "Subtitles") { c.panel = Panel.SUBTITLES }
                 Tile(I.Equalizer, "Equalizer") { c.panel = Panel.EQUALIZER }
+                Tile(if (c.repeatMode == androidx.media3.common.Player.REPEAT_MODE_ONE) I.RepeatOne else I.Repeat, "Repeat", c.repeatLabel(),
+                    on = c.repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF) { c.cycleRepeat() }
+                Tile(I.Shuffle, "Shuffle", if (c.shuffle) "On" else "Off", on = c.shuffle) { c.toggleShuffle() }
                 Tile(I.NightsStay, "Night mode", if (c.nightMode) "On" else "Off", on = c.nightMode) { c.toggleNightMode() }
                 Tile(I.Bedtime, "Sleep timer", sleepLabelShort(c), on = c.sleepAt != null || c.sleepEndOfVideo) { c.panel = Panel.SLEEP }
                 Tile(I.Repeat, "A–B repeat", when { c.abA == null -> "Off"; c.abB == null -> "Set B"; else -> "On" }, on = c.abA != null) { c.abRepeatTap() }

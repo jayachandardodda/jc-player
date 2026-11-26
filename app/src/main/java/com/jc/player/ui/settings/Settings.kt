@@ -129,7 +129,7 @@ fun SettingsScreen(onPlayerButtons: () -> Unit = {}, onHistory: () -> Unit = {},
             item { Choice("Clean up storage", "Find duplicates, watched and large videos") { onCleaner() } }
 
             item { Header("About") }
-            item { Choice("JC Player 1.1", "No ads, no tracking. Built on Media3/ExoPlayer and FFmpeg.") {} }
+            item { Choice("JC Player 1.2", "No ads, no tracking. Built on Media3/ExoPlayer and FFmpeg.") {} }
         }
     }
 
@@ -262,7 +262,7 @@ private fun Picker(title: String, options: List<String>, selected: Int, onDismis
 private val buttonLabels = mapOf(
     "lock" to "Screen lock", "aspect" to "Aspect ratio", "rotate" to "Rotate", "screenshot" to "Screenshot",
     "speed" to "Playback speed", "background" to "Background play", "pip" to "Picture-in-picture",
-    "night" to "Night mode", "equalizer" to "Equalizer", "sleep" to "Sleep timer", "abrepeat" to "A–B repeat",
+    "repeat" to "Repeat", "shuffle" to "Shuffle", "night" to "Night mode", "equalizer" to "Equalizer", "sleep" to "Sleep timer", "abrepeat" to "A–B repeat",
     "quick" to "Quick settings",
 )
 

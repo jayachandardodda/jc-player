@@ -68,6 +68,8 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PictureInPictureAlt
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.RepeatOne
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Replay10
 import androidx.compose.material.icons.filled.ScreenRotation
 import androidx.compose.material.icons.filled.SkipNext
@@ -535,6 +537,9 @@ private fun BottomButton(id: String, c: PlayerController, activity: PlayerActivi
             c.toast(if (c.backgroundPlay) "Background play on" else "Background play off")
         }
         "pip" -> btn(Icons.Default.PictureInPictureAlt, "Picture-in-picture") { activity.enterPip() }
+        "repeat" -> btn(if (c.repeatMode == androidx.media3.common.Player.REPEAT_MODE_ONE) Icons.Default.RepeatOne else Icons.Default.Repeat,
+            "Repeat", c.repeatMode != androidx.media3.common.Player.REPEAT_MODE_OFF) { c.cycleRepeat() }
+        "shuffle" -> btn(Icons.Default.Shuffle, "Shuffle", c.shuffle) { c.toggleShuffle() }
         "night" -> btn(Icons.Default.NightsStay, "Night mode", c.nightMode) { c.toggleNightMode() }
         "equalizer" -> btn(Icons.Default.Equalizer, "Equalizer") { c.panel = Panel.EQUALIZER }
         "sleep" -> btn(Icons.Default.Bedtime, "Sleep timer", c.sleepAt != null || c.sleepEndOfVideo) { c.panel = Panel.SLEEP }

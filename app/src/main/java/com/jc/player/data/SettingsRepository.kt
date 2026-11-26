@@ -56,6 +56,9 @@ data class AppSettings(
     val bassBoost: Int = 0,
     // Night mode: compresses loud/quiet audio for late-night viewing
     val nightMode: Boolean = false,
+    // 0 = off, 1 = repeat one, 2 = repeat all (same values as Media3's Player.REPEAT_MODE_*)
+    val repeatMode: Int = 0,
+    val shuffle: Boolean = false,
     // Bottom-bar buttons in the player, in display order
     val playerButtons: List<String> = DEFAULT_PLAYER_BUTTONS,
     // Videos added after this time (and never played) get a NEW badge. 0 = not set yet.
@@ -65,7 +68,7 @@ data class AppSettings(
     val smbServers: List<SmbServer> = emptyList(),
 )
 
-val ALL_PLAYER_BUTTONS = listOf("lock", "aspect", "rotate", "screenshot", "speed", "background", "pip", "night", "equalizer", "sleep", "abrepeat", "quick")
+val ALL_PLAYER_BUTTONS = listOf("lock", "aspect", "rotate", "screenshot", "speed", "background", "pip", "repeat", "shuffle", "night", "equalizer", "sleep", "abrepeat", "quick")
 val DEFAULT_PLAYER_BUTTONS = listOf("lock", "aspect", "rotate", "screenshot", "speed", "background", "pip")
 
 /**
@@ -144,6 +147,8 @@ class SettingsRepository(context: Context) {
             eqBands = s("eqBands", "").split(',').mapNotNull { it.toIntOrNull() },
             bassBoost = i("bassBoost", 0),
             nightMode = b("nightMode", false),
+            repeatMode = i("repeatMode", 0).coerceIn(0, 2),
+            shuffle = b("shuffle", false),
             playerButtons = s("playerButtons", DEFAULT_PLAYER_BUTTONS.joinToString(","))
                 .split(',').filter { it in ALL_PLAYER_BUTTONS },
             newBaselineSec = prefs.getLong("newBaseline", 0L),
@@ -193,6 +198,8 @@ class SettingsRepository(context: Context) {
             .putString("eqBands", a.eqBands.joinToString(","))
             .putInt("bassBoost", a.bassBoost)
             .putBoolean("nightMode", a.nightMode)
+            .putInt("repeatMode", a.repeatMode)
+            .putBoolean("shuffle", a.shuffle)
             .putString("playerButtons", a.playerButtons.joinToString(","))
             .putLong("newBaseline", a.newBaselineSec)
             .putString("urlHistory", a.urlHistory.joinToString("\n"))

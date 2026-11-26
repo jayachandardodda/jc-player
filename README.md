@@ -5,25 +5,11 @@ Jetpack Compose and Media3 (ExoPlayer), plus FFmpeg for extra audio codecs.
 
 ## Install on your phone
 
-**Ready-made APK** (after a build):
+1. On your phone, open **[Releases](https://github.com/jayachandardodda/jc-player/releases/latest)** and download `JC-Player-vX.Y.Z.apk`.
+2. Open the file, allow installs from that source when asked, and tap **Install**.
+3. If Play Protect warns about an unknown app, tap **More details → Install anyway**.
 
-- `app/build/outputs/apk/release/app-release.apk` (smaller, faster; recommended)
-- `app/build/outputs/apk/debug/app-debug.apk`
-
-Copy the APK to your phone and open it. Android will ask you to allow installs from that
-source the first time.
-
-**Or install over USB:**
-
-1. On the phone: Settings → About phone → tap *Build number* 7 times → back to Settings →
-   Developer options → turn on **USB debugging**.
-2. Plug the phone in and accept the "Allow USB debugging?" prompt.
-3. From this folder:
-
-```powershell
-$env:JAVA_HOME = "$env:LOCALAPPDATA\Programs\jdk17"
-.\gradlew.bat installRelease      # or installDebug
-```
+Needs Android 8.0+. See **[docs/INSTALL.md](docs/INSTALL.md)** for step-by-step help, updating and troubleshooting.
 
 ## Build
 
@@ -53,6 +39,7 @@ You can also open the folder in Android Studio and press Run.
 - Long-press a folder: play all, hide, or move to the PIN-protected **Private folder**
 
 **Player**
+- Folder covers made from the videos inside, repeat (one/all) and shuffle
 - Gestures: left side swipe = brightness, right side = volume (boost up to 200%), sideways = seek,
   double-tap sides = ±10 s (taps add up), double-tap centre = play/pause, pinch = zoom & pan
 - Remembers where you stopped in every video, with a "Start over" button

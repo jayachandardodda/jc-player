@@ -119,6 +119,8 @@ class PlayerController(private val activity: PlayerActivity) : Player.Listener {
     private var speedBeforeFastForward = 1f
     var flashKey by mutableIntStateOf(0)
     var nightMode by mutableStateOf(false)
+    var repeatMode by mutableIntStateOf(Player.REPEAT_MODE_OFF)
+    var shuffle by mutableStateOf(false)
 
     // Seek preview
     val previewer = com.jc.player.player.FramePreviewer(activity.applicationContext)
@@ -152,6 +154,10 @@ class PlayerController(private val activity: PlayerActivity) : Player.Listener {
             .setPreferredTextLanguage(settings.preferredSubtitleLang.ifBlank { null })
             .build()
         p.pauseAtEndOfMediaItems = !settings.autoPlayNext
+        p.repeatMode = settings.repeatMode
+        p.shuffleModeEnabled = settings.shuffle
+        repeatMode = settings.repeatMode
+        shuffle = settings.shuffle
         syncFromPlayer()
     }
 
@@ -278,7 +284,7 @@ class PlayerController(private val activity: PlayerActivity) : Player.Listener {
         if (state == Player.STATE_ENDED && !casting) {
             val p = player ?: return
             p.currentMediaItem?.let { save(it, p.duration, p.duration) }
-            if (!p.hasNextMediaItem() || sleepEndOfVideo) activity.finish()
+            if (p.repeatMode == Player.REPEAT_MODE_OFF && (!p.hasNextMediaItem() || sleepEndOfVideo)) activity.finish()
         }
     }
 
@@ -459,6 +465,32 @@ class PlayerController(private val activity: PlayerActivity) : Player.Listener {
         active?.setPlaybackSpeed(speedBeforeFastForward)
         fastForwarding = false
     }
+
+    // ---------------- repeat & shuffle ----------------
+
+    /** Off -> Repeat all -> Repeat one -> Off. */
+    fun cycleRepeat() {
+        val next = when (repeatMode) {
+            Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+            Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+            else -> Player.REPEAT_MODE_OFF
+        }
+        repeatMode = next
+        active?.repeatMode = next
+        app.settings.update { it.copy(repeatMode = next) }
+        toast(when (next) { Player.REPEAT_MODE_ALL -> "Repeat all"; Player.REPEAT_MODE_ONE -> "Repeat this video"; else -> "Repeat off" })
+        syncFromPlayer()
+    }
+
+    fun toggleShuffle() {
+        shuffle = !shuffle
+        active?.shuffleModeEnabled = shuffle
+        app.settings.update { it.copy(shuffle = shuffle) }
+        toast(if (shuffle) "Shuffle on" else "Shuffle off")
+        syncFromPlayer()
+    }
+
+    fun repeatLabel() = when (repeatMode) { Player.REPEAT_MODE_ALL -> "All"; Player.REPEAT_MODE_ONE -> "One"; else -> "Off" }
 
     // ---------------- night mode ----------------
 
