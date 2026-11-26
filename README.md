@@ -1,6 +1,6 @@
 # JC Player
 
-An ad-free Android video player with MX Player Pro-style features. Built with Kotlin,
+An ad-free Android video player with pro features: gestures, subtitles, network streaming and more. Built with Kotlin,
 Jetpack Compose and Media3 (ExoPlayer), plus FFmpeg for extra audio codecs.
 
 ## Install on your phone
@@ -100,3 +100,13 @@ app/src/main/java/com/jc/player/
 - Built-in (embedded) subtitles can only be delayed, not shown earlier. Subtitle files can be shifted either way.
 - Casting videos from SMB shares isn't supported yet. Casting local files and URLs works.
 - SMB passwords are stored in the app's private storage, not encrypted.
+
+## License
+
+JC Player is released under the [MIT License](LICENSE).
+
+It uses open-source libraries under their own licences, including
+[Media3/ExoPlayer](https://github.com/androidx/media) (Apache 2.0),
+the [Jellyfin FFmpeg decoder](https://github.com/jellyfin/jellyfin-androidx-media) (built on FFmpeg, LGPL/GPL),
+[smbj](https://github.com/hierynomus/smbj) (Apache 2.0) and [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd) (BSD).
+
