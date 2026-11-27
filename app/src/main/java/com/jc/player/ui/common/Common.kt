@@ -3,6 +3,7 @@ package com.jc.player.ui.common
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +33,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -158,54 +163,19 @@ fun TextInputDialog(
     )
 }
 
-/** A single video frame, cropped to fill. */
-@Composable
-private fun Frame(uri: Uri, modifier: Modifier) {
-    val context = LocalContext.current
-    AsyncImage(
-        model = ImageRequest.Builder(context).data(uri).videoFrameMillis(2000).build(),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = modifier.background(Color(0xFF2A2D35)),
-    )
-}
-
 /**
- * Folder cover made from the newest videos inside it:
- * 1 video = full frame, 2 = side by side, 3 = one large + two small, 4+ = 2x2 grid.
+ * Plain folder shape drawn in code (no video frames are decoded, so the list stays fast).
+ * The body fills the given size; the tab sits on the top-left.
  */
 @Composable
-fun FolderThumbnail(videos: List<com.jc.player.data.VideoItem>, modifier: Modifier = Modifier) {
-    val picks = remember(videos) { videos.sortedByDescending { it.dateAddedSec }.take(4).map { it.uri } }
-    val gap = 1.5.dp
-    Box(modifier.clip(RoundedCornerShape(10.dp)).background(Color(0xFF2A2D35))) {
-        when (picks.size) {
-            0 -> Icon(Icons.Default.Folder, null, Modifier.align(Alignment.Center).size(28.dp),
-                tint = MaterialTheme.colorScheme.primary)
-            1 -> Frame(picks[0], Modifier.fillMaxSize())
-            2 -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(gap)) {
-                Frame(picks[0], Modifier.weight(1f).fillMaxHeight())
-                Frame(picks[1], Modifier.weight(1f).fillMaxHeight())
-            }
-            3 -> Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(gap)) {
-                Frame(picks[0], Modifier.weight(1f).fillMaxHeight())
-                Column(Modifier.weight(1f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(gap)) {
-                    Frame(picks[1], Modifier.weight(1f).fillMaxWidth())
-                    Frame(picks[2], Modifier.weight(1f).fillMaxWidth())
-                }
-            }
-            else -> Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(gap)) {
-                for (row in 0..1) Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(gap)) {
-                    Frame(picks[row * 2], Modifier.weight(1f).fillMaxHeight())
-                    Frame(picks[row * 2 + 1], Modifier.weight(1f).fillMaxHeight())
-                }
-            }
-        }
-        if (picks.isNotEmpty()) Box(
-            Modifier.align(Alignment.BottomStart).padding(4.dp)
-                .background(Color(0xB3000000), RoundedCornerShape(5.dp)).padding(horizontal = 4.dp, vertical = 2.dp)
-        ) {
-            Icon(Icons.Default.Folder, null, Modifier.size(12.dp), tint = Color.White)
-        }
+fun FolderIcon(modifier: Modifier = Modifier) {
+    val dark = MaterialTheme.colorScheme.background.luminance() < 0.5f
+    val tab = if (dark) Color(0xFF353A45) else Color(0xFFAEB5C1)
+    val body = if (dark) Color(0xFF424855) else Color(0xFFC3C9D3)
+    Canvas(modifier) {
+        val r = CornerRadius(size.minDimension * 0.12f)
+        val tabH = size.height * 0.2f
+        drawRoundRect(tab, topLeft = Offset.Zero, size = Size(size.width * 0.42f, tabH * 2), cornerRadius = r)
+        drawRoundRect(body, topLeft = Offset(0f, tabH), size = Size(size.width, size.height - tabH), cornerRadius = r)
     }
 }

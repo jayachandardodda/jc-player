@@ -200,7 +200,7 @@ fun FoldersScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Box {
-                            com.jc.player.ui.common.FolderThumbnail(folder.videos, Modifier.size(width = 88.dp, height = 56.dp))
+                            com.jc.player.ui.common.FolderIcon(Modifier.size(width = 76.dp, height = 56.dp))
                             if (newCount > 0) CountBadge(newCount, Modifier.align(Alignment.TopEnd).offset(x = 7.dp, y = (-7).dp))
                         }
                         Column(Modifier.padding(start = 14.dp).weight(1f)) {
