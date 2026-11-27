@@ -110,9 +110,13 @@ fun rememberFavorites(): List<FavoriteEntity> {
     return favs
 }
 
-/** NEW = added after the app first scanned this phone, and never played. */
+/** How long a video counts as NEW after it lands on the phone (same idea as MX Player). */
+const val NEW_WINDOW_SEC = 7L * 24 * 60 * 60
+
+/** NEW = added to the phone within the last 7 days and never played. */
+@Suppress("UNUSED_PARAMETER")
 fun isNew(v: VideoItem, progress: Map<String, Float>, s: AppSettings): Boolean =
-    s.newBaselineSec > 0 && v.dateAddedSec > s.newBaselineSec && progress[v.uri.toString()] == null
+    v.dateAddedSec >= System.currentTimeMillis() / 1000 - NEW_WINDOW_SEC && progress[v.uri.toString()] == null
 
 /** Plays [video] with the rest of its folder queued after it. */
 fun folderQueueFor(video: VideoItem, all: List<VideoItem>, s: AppSettings): Pair<List<QueueItem>, Int> {

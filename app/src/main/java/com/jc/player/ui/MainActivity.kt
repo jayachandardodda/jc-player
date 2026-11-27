@@ -128,9 +128,6 @@ private fun PermissionGate(content: @Composable () -> Unit) {
 
     if (ok) {
         LaunchedEffect(Unit) {
-            // First run: everything already on the phone counts as "seen"; only later videos get NEW.
-            val repo = JcApp.instance.settings
-            if (repo.current.newBaselineSec == 0L) repo.update { it.copy(newBaselineSec = System.currentTimeMillis() / 1000) }
             JcApp.instance.media.start()
         }
         content()

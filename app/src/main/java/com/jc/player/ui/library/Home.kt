@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,10 +22,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.History
@@ -56,6 +60,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -66,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import com.jc.player.JcApp
 import com.jc.player.data.VideoFolder
 import com.jc.player.data.VideoItem
+import com.jc.player.data.db.PlaybackStateEntity
 import com.jc.player.data.formatDuration
 import com.jc.player.data.formatSize
 import com.jc.player.ui.common.EmptyState
@@ -106,14 +113,15 @@ fun FoldersScreen(
         val sorted = sortFolders(grouped, settings)
         sorted.filter { it.path in favFolderKeys } + sorted.filter { it.path !in favFolderKeys }
     }
-    val continueWatching = remember(states, byUri) {
+    // Local history: everything played, most recent first (only files that still exist and are visible).
+    val history = remember(states, byUri) {
         states.sortedByDescending { it.lastPlayed }
-            .filter { it.durationMs > 0 && it.positionMs > 3_000 && it.positionMs < it.durationMs - 10_000 }
-            .mapNotNull { s -> byUri[s.uri]?.let { it to s.positionMs } }
-            .take(15)
+            .mapNotNull { s -> byUri[s.uri]?.let { it to s } }
+            .take(20)
     }
+    // The folder holding the most recently played video gets its name in the accent colour.
+    val lastPlayedFolder = history.firstOrNull()?.first?.folderPath
     val favoriteVideos = remember(favorites, byUri) { favorites.filter { it.type == "video" }.mapNotNull { byUri[it.key] } }
-    val recent = remember(visible) { visible.sortedByDescending { it.dateAddedSec }.take(15) }
 
     fun play(v: VideoItem) { val (q, i) = folderQueueFor(v, videos, settings); context.playQueue(q, i) }
 
@@ -157,12 +165,17 @@ fun FoldersScreen(
             if (folders.isEmpty()) {
                 if (!loading) EmptyState(Icons.Default.VideoLibrary, "No videos found", "Videos you save or download will show up here.")
             } else LazyColumn(Modifier.fillMaxSize()) {
-                if (continueWatching.isNotEmpty()) {
-                    item(key = "cw") {
-                        SectionHeader("Continue watching", "See all", onHistory)
-                        LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            items(continueWatching, key = { it.first.id }) { (v, pos) ->
-                                ContinueCard(v, pos) { play(v) }
+                if (history.isNotEmpty()) {
+                    item(key = "history") {
+                        SectionHeader("Local history", "See all", onHistory)
+                        LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            items(history, key = { it.second.uri }) { (v, s) ->
+                                HistoryCard(
+                                    v, s,
+                                    modifier = Modifier.animateItem(),
+                                    onClick = { play(v) },
+                                    onRemove = { scope.launch { app.database.playbackState().delete(s.uri) } },
+                                )
                             }
                         }
                     }
@@ -172,14 +185,6 @@ fun FoldersScreen(
                         SectionHeader("Favourites")
                         LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             items(favoriteVideos, key = { it.id }) { v -> SmallCard(v, progress[v.uri.toString()], false) { play(v) } }
-                        }
-                    }
-                }
-                if (recent.isNotEmpty()) {
-                    item(key = "recent") {
-                        SectionHeader("Recently added")
-                        LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            items(recent, key = { it.id }) { v -> SmallCard(v, progress[v.uri.toString()], isNew(v, progress, settings)) { play(v) } }
                         }
                     }
                 }
@@ -194,20 +199,20 @@ fun FoldersScreen(
                             .padding(horizontal = 16.dp, vertical = 9.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        com.jc.player.ui.common.FolderThumbnail(folder.videos, Modifier.size(width = 88.dp, height = 56.dp))
+                        Box {
+                            com.jc.player.ui.common.FolderThumbnail(folder.videos, Modifier.size(width = 88.dp, height = 56.dp))
+                            if (newCount > 0) CountBadge(newCount, Modifier.align(Alignment.TopEnd).offset(x = 7.dp, y = (-7).dp))
+                        }
                         Column(Modifier.padding(start = 14.dp).weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(folder.name, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                    color = if (folder.path == lastPlayedFolder) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                     modifier = Modifier.weight(1f, fill = false))
                                 if (folder.path in favFolderKeys) Icon(Icons.Default.Star, null, Modifier.padding(start = 6.dp).size(16.dp), tint = Gold)
                             }
                             Text("${folder.count} video${if (folder.count == 1) "" else "s"} · ${formatSize(folder.totalSize)}",
                                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        if (newCount > 0) Text(
-                            "$newCount new", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold,
-                            modifier = Modifier.background(MaterialTheme.colorScheme.primary, RoundedCornerShape(10.dp)).padding(horizontal = 8.dp, vertical = 2.dp),
-                        )
                     }
                 }
                 item { Spacer(Modifier.height(24.dp)) }
@@ -250,20 +255,52 @@ fun FoldersScreen(
     }
 }
 
+/** A Local-history tile: thumbnail with how far you got, plus a menu to remove just this entry. */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ContinueCard(v: VideoItem, positionMs: Long, onClick: () -> Unit) {
-    Column(Modifier.width(220.dp).combinedClickableCompat(onClick)) {
+private fun HistoryCard(v: VideoItem, s: PlaybackStateEntity, modifier: Modifier = Modifier, onClick: () -> Unit, onRemove: () -> Unit) {
+    var menu by remember { mutableStateOf(false) }
+    val duration = if (s.durationMs > 0) s.durationMs else v.durationMs
+    val progress = if (duration > 0) s.positionMs.toFloat() / duration else 0f
+    Column(modifier.width(172.dp).combinedClickable(onClick = onClick, onLongClick = { menu = true })) {
         Box {
-            VideoThumbnail(v.uri, null, positionMs.toFloat() / v.durationMs.coerceAtLeast(1), Modifier.fillMaxWidth().aspectRatio(16f / 9f))
-            Box(
-                Modifier.align(Alignment.Center).size(44.dp).background(Color(0x99000000), RoundedCornerShape(22.dp)),
-                contentAlignment = Alignment.Center,
-            ) { Icon(Icons.Default.PlayArrow, null, tint = Color.White) }
+            VideoThumbnail(v.uri, formatDuration(duration), progress, Modifier.fillMaxWidth().aspectRatio(16f / 10f))
+            Box(Modifier.align(Alignment.TopEnd).padding(4.dp)) {
+                Box(
+                    Modifier.size(26.dp).clip(CircleShape).background(Color(0x73000000)).combinedClickable(onClick = { menu = true }),
+                    contentAlignment = Alignment.Center,
+                ) { Icon(Icons.Default.MoreVert, "Options", tint = Color.White, modifier = Modifier.size(18.dp)) }
+                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                    DropdownMenuItem(text = { Text("Play") }, leadingIcon = { Icon(Icons.Default.PlayArrow, null) },
+                        onClick = { menu = false; onClick() })
+                    DropdownMenuItem(text = { Text("Remove from history") }, leadingIcon = { Icon(Icons.Default.Close, null) },
+                        onClick = { menu = false; onRemove() })
+                }
+            }
         }
-        Text(v.title, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 6.dp))
-        Text("${formatDuration(v.durationMs - positionMs)} left", style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(v.title, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(top = 6.dp))
+    }
+}
+
+/** Red unwatched-count badge that sits on the folder icon's corner (capped at 99+). */
+@Composable
+private fun CountBadge(count: Int, modifier: Modifier = Modifier) {
+    val pill = RoundedCornerShape(50)
+    Box(
+        modifier
+            .shadow(3.dp, pill)
+            .background(MaterialTheme.colorScheme.background, pill) // ring that separates it from the thumbnail
+            .padding(2.dp)
+            .defaultMinSize(minWidth = 20.dp, minHeight = 20.dp)
+            .background(Brush.verticalGradient(listOf(Color(0xFFFF5470), Color(0xFFE0243F))), pill)
+            .padding(horizontal = 5.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            if (count > 99) "99+" else count.toString(),
+            color = Color.White, fontSize = 11.sp, lineHeight = 11.sp, fontWeight = FontWeight.Bold,
+        )
     }
 }
 

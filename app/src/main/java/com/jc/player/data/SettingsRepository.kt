@@ -61,8 +61,6 @@ data class AppSettings(
     val shuffle: Boolean = false,
     // Bottom-bar buttons in the player, in display order
     val playerButtons: List<String> = DEFAULT_PLAYER_BUTTONS,
-    // Videos added after this time (and never played) get a NEW badge. 0 = not set yet.
-    val newBaselineSec: Long = 0,
     // Network
     val urlHistory: List<String> = emptyList(),
     val smbServers: List<SmbServer> = emptyList(),
@@ -151,7 +149,6 @@ class SettingsRepository(context: Context) {
             shuffle = b("shuffle", false),
             playerButtons = s("playerButtons", DEFAULT_PLAYER_BUTTONS.joinToString(","))
                 .split(',').filter { it in ALL_PLAYER_BUTTONS },
-            newBaselineSec = prefs.getLong("newBaseline", 0L),
             urlHistory = s("urlHistory", "").split('\n').filter { it.isNotBlank() },
             smbServers = parseServers(s("smbServers", "[]")),
         )
@@ -201,7 +198,6 @@ class SettingsRepository(context: Context) {
             .putInt("repeatMode", a.repeatMode)
             .putBoolean("shuffle", a.shuffle)
             .putString("playerButtons", a.playerButtons.joinToString(","))
-            .putLong("newBaseline", a.newBaselineSec)
             .putString("urlHistory", a.urlHistory.joinToString("\n"))
             .putString("smbServers", serializeServers(a.smbServers))
             .apply()
