@@ -14,3 +14,6 @@ keystore.properties
 .kotlin/
 # Test clip for the browser mockup (Google ExoPlayer test media), not committed
 mockup/sample.mp4
+
+# Built app copied to the project root for easy install
+*.apk

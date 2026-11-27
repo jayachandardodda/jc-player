@@ -106,3 +106,11 @@ dependencies {
 
     testImplementation("junit:junit:4.13.2")
 }
+
+// After every debug build, put a copy at the project root as "JC Video.apk" so it's easy to find.
+val copyApk by tasks.registering {
+    val src = layout.buildDirectory.file("outputs/apk/debug/app-debug.apk")
+    val dest = rootProject.layout.projectDirectory.file("JC Video.apk").asFile
+    doLast { src.get().asFile.copyTo(dest, overwrite = true) }
+}
+afterEvaluate { tasks.named("assembleDebug") { finalizedBy(copyApk) } }
